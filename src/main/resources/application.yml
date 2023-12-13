@@ -1,2 +1,4 @@
 spring:
     profiles.active: ${PROFILE}
+    main:
+        banner-mode: off
