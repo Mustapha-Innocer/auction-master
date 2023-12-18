@@ -55,9 +55,6 @@ public class User {
 	@Enumerated(EnumType.STRING)
 	private UserType role;
 
-	@Column(name = "is_active", nullable = false)
-	private Boolean isAactive;
-
 	@OneToOne(
 		mappedBy = "user",
 		cascade = CascadeType.ALL
@@ -74,11 +71,10 @@ public class User {
 	@Temporal(TemporalType.TIMESTAMP)
 	private LocalDateTime updatedAt;
 
-	public User(String email, String password, UserType role, Boolean isAactive) {
+	public User(String email, String password, UserType role) {
 		this.email = email;
 		this.password = password;
 		this.role = role;
-		this.isAactive = isAactive;
 	}
 
 }
