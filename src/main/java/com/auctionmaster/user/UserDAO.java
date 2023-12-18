@@ -2,8 +2,11 @@ package com.auctionmaster.user;
 
 import java.util.Optional;
 
+import org.springframework.stereotype.Repository;
+
 import lombok.AllArgsConstructor;
 
+@Repository
 @AllArgsConstructor
 public class UserDAO implements IUserDAO{
 	
