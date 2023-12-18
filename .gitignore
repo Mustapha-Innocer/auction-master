@@ -4,9 +4,10 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
-### Custome ###
+### Custom ###
 docs/
 .env
+.rest
 
 ### STS ###
 .apt_generated
