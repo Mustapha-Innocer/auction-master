@@ -1,11 +1,13 @@
 package com.auctionmaster.user;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import com.auctionmaster.token.Token;
 import com.auctionmaster.userprofile.UserProfile;
 
 import jakarta.persistence.CascadeType;
@@ -14,9 +16,11 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
@@ -60,6 +64,13 @@ public class User {
 		cascade = CascadeType.ALL
 	)
 	private UserProfile profile;
+
+	@OneToMany(
+		mappedBy = "user",
+		fetch = FetchType.EAGER,
+		cascade = CascadeType.ALL
+	)
+	private List<Token> tokens;
 
 	@Column(name = "created_at", nullable = false, updatable = false, columnDefinition = "TIMESTAMP WITHOUT TIME ZONE")
 	@CreatedDate
