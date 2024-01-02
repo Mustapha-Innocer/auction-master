@@ -59,17 +59,10 @@ public class User {
 	@Enumerated(EnumType.STRING)
 	private UserType role;
 
-	@OneToOne(
-		mappedBy = "user",
-		cascade = CascadeType.ALL
-	)
+	@OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
 	private UserProfile profile;
 
-	@OneToMany(
-		mappedBy = "user",
-		fetch = FetchType.EAGER,
-		cascade = CascadeType.ALL
-	)
+	@OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	private List<Token> tokens;
 
 	@Column(name = "created_at", nullable = false, updatable = false, columnDefinition = "TIMESTAMP WITHOUT TIME ZONE")

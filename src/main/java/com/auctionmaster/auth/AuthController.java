@@ -20,5 +20,10 @@ public class AuthController {
 	public AuthResponse register(@RequestBody User newUser) throws Exception{
 		return authService.register(newUser);
 	}
+
+	@PostMapping("/login")
+	public AuthResponse authenticate(@RequestBody User user) throws Exception{
+		return authService.authenticate(user);
+	}
 	
 }
