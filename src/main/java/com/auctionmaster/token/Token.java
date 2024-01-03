@@ -57,15 +57,10 @@ public class Token {
 	@Column(nullable = false)
 	private Boolean revoked;
 
-	@NonNull
-	@Column(nullable = false)
-	private Boolean expired;
-
 	@Override
 	public String toString() {
 		return "Token [id=" + id + ", token=" + token + ", userId=" + user.getId() + ", tokenType=" + tokenType + ", revoked="
-				+ revoked + ", expired=" + expired + "]";
+				+ revoked + "]";
 	}
-
 	
 }

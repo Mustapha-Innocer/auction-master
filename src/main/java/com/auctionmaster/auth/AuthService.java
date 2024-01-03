@@ -2,7 +2,6 @@ package com.auctionmaster.auth;
 
 import java.util.List;
 import java.util.Optional;
-
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -15,7 +14,6 @@ import com.auctionmaster.token.TokenRepository;
 import com.auctionmaster.token.TokenType;
 import com.auctionmaster.user.User;
 import com.auctionmaster.user.UserDAO;
-import com.auctionmaster.user.UserType;
 
 import lombok.RequiredArgsConstructor;
 
@@ -45,12 +43,20 @@ public class AuthService {
 
 		tokenRepository.saveAll(
 				List.of(
-						new Token(token, user, TokenType.BEARER, false, false),
-						new Token(refreshToken, user, TokenType.BEARER, false, false)));
+						new Token(token, user, TokenType.BEARER, false),
+						new Token(refreshToken, user, TokenType.BEARER, false)));
 
 		return new AuthResponse(
 				token,
 				refreshToken);
+	}
+
+	private void revokeAllValidUserTokens(User user) {
+		List<Token> validTokens = tokenRepository.findAllByUserIdAndRevoked(user.getId(), false);
+		validTokens.forEach(
+			token -> token.setRevoked(true)
+		);
+		tokenRepository.saveAll(validTokens);
 	}
 
 	public AuthResponse register(User newUser) {
@@ -63,13 +69,12 @@ public class AuthService {
 		});
 
 		newUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
-		newUser.setRole(UserType.ADMIN);
 		newUser = userDAO.saveUser(newUser);
 
 		return generateTokens(newUser);
 	}
 
-	public AuthResponse authenticate(User loginDetails) throws Exception{
+	public AuthResponse authenticate(User loginDetails) throws Exception {
 
 		authenticationManager.authenticate(
 				new UsernamePasswordAuthenticationToken(
@@ -77,6 +82,8 @@ public class AuthService {
 						loginDetails.getPassword()));
 
 		User user = userDAO.getUserByEmail(loginDetails.getEmail()).get();
+
+		revokeAllValidUserTokens(user);
 
 		return generateTokens(user);
 	}
