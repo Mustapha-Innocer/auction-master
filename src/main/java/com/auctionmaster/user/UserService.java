@@ -17,7 +17,6 @@ public class UserService implements IUserService {
 	@Override
 	public User createUser(User user) {
 		user.setPassword(passwordEncoder.encode(user.getPassword()));
-		user.setRole(UserType.BIDDER);
 		return userDAO.saveUser(user);
 	}
 

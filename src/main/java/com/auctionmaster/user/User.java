@@ -29,18 +29,15 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import jakarta.persistence.UniqueConstraint;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
 
 @Entity(name = "User")
 @Table(name = "users", uniqueConstraints = {
 		@UniqueConstraint(name = "email_unique_constraint", columnNames = "email")
 })
-@Getter
-@Setter
-@ToString
+
+@Data
 @NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 public class User {
@@ -48,6 +45,7 @@ public class User {
 	@Id
 	@SequenceGenerator(name = "user_id_sequence", sequenceName = "user_id_sequence", allocationSize = 1)
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_id_sequence")
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	@Column(name = "id", updatable = false)
 	private Long id;
 
@@ -58,10 +56,12 @@ public class User {
 	@Column(name = "password_hash", nullable = false)
 	private String password;
 
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	@Column(name = "role", nullable = false)
 	@Enumerated(EnumType.STRING)
 	private UserType role;
 
+	@JsonIgnore
 	@OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
 	private UserProfile profile;
 
@@ -69,11 +69,13 @@ public class User {
 	@OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	private List<Token> tokens;
 
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	@Column(name = "created_at", nullable = false, updatable = false, columnDefinition = "TIMESTAMP WITHOUT TIME ZONE")
 	@CreatedDate
 	@Temporal(TemporalType.TIMESTAMP)
 	private LocalDateTime createdAt;
 
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	@Column(name = "updated_at", nullable = false, columnDefinition = "TIMESTAMP WITHOUT TIME ZONE")
 	@LastModifiedDate
 	@Temporal(TemporalType.TIMESTAMP)
@@ -83,6 +85,11 @@ public class User {
 		this.email = email;
 		this.password = password;
 		this.role = role;
+	}
+
+	public User(String email, String password) {
+		this.email = email;
+		this.password = password;
 	}
 
 }
