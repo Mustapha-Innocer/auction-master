@@ -24,11 +24,26 @@ public class SecurityConfig {
 	private final AuthenticationProvider authenticationProvider;
 	private final LogoutHandler logoutHandler;
 
+	private final String[] WHITE_LIST_URLS = {
+			"/api",
+			"/api/v1/auth/*",
+			"/v2/api-docs",
+			"/v3/api-docs",
+			"/v3/api-docs/**",
+			"/swagger-resources",
+			"/swagger-resources/**",
+			"/configuration/ui",
+			"/configuration/security",
+			"/swagger-ui/**",
+			"/webjars/**",
+			"/swagger-ui.html"
+	};
+
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		return http
 				.csrf(csrf -> csrf.disable())
-				.authorizeHttpRequests(req -> req.requestMatchers("/api/v1/auth/*").permitAll()
+				.authorizeHttpRequests(req -> req.requestMatchers(WHITE_LIST_URLS).permitAll()
 						.anyRequest()
 						.authenticated())
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
