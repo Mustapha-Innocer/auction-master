@@ -8,8 +8,7 @@ import com.google.common.collect.Sets;
 
 public enum UserType {
 	ADMIN,
-	BIDDER,
-	ARTIST;
+	USER;
 
 	public Set<SimpleGrantedAuthority> getAuthorities() {
 		return Sets.newHashSet(new SimpleGrantedAuthority("ROLE_" + this.name()));
