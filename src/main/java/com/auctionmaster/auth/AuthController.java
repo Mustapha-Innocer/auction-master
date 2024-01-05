@@ -24,21 +24,11 @@ public class AuthController {
 
 	@PostMapping("/register")
 	public ResponseEntity<AuthResponse> register(@RequestBody @Valid AuthRequest newUser) throws Exception{
-		User user = new User(
-			newUser.getEmail(),
-			newUser.getPassword(),
-			UserType.USER
-		);
-		return new ResponseEntity<>(authService.register(user), HttpStatus.CREATED);
+		return new ResponseEntity<>(authService.register(newUser), HttpStatus.CREATED);
 	}
 
 	@PostMapping("/login")
-	public AuthResponse authenticate(@RequestBody AuthRequest loginDetails) throws Exception{
-		User user = new User(
-			loginDetails.getEmail(),
-			loginDetails.getPassword()
-		);
-		return authService.authenticate(user);
-	}
-	
+	public ResponseEntity<AuthResponse> authenticate(@RequestBody AuthRequest newUser) throws Exception{
+		return new ResponseEntity<>(authService.authenticate(newUser), HttpStatus.OK);
+	}	
 }

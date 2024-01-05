@@ -1,10 +1,8 @@
 package com.auctionmaster.auth;
 
 import java.util.List;
-import java.util.Optional;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.auctionmaster.config.JwtService;
@@ -14,37 +12,36 @@ import com.auctionmaster.token.TokenRepository;
 import com.auctionmaster.token.TokenType;
 import com.auctionmaster.user.User;
 import com.auctionmaster.user.UserDAO;
+import com.auctionmaster.user.UserService;
+import com.auctionmaster.user.UserType;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AuthService {
 
-	private final PasswordEncoder passwordEncoder;
 	private final JwtService jwtService;
+	private final UserService userService;
 	private final UserDAO userDAO;
 	private final TokenRepository tokenRepository;
 	private final AuthenticationManager authenticationManager;
 
 	private AuthResponse generateTokens(User user) {
 
-		AuthUser authUser = new AuthUser(
-				user.getEmail(),
-				user.getPassword(),
-				user.getRole().getAuthorities(),
-				true,
-				true,
-				true,
-				true);
+		log.debug("Generating new JWT tokens.");
 
-		String token = jwtService.generateToken(authUser);
-		String refreshToken = jwtService.generateRefreshToken(authUser);
+		String token = jwtService.generateToken(user);
+		String refreshToken = jwtService.generateRefreshToken(user);
 
 		tokenRepository.saveAll(
 				List.of(
 						new Token(token, user, TokenType.BEARER, false),
 						new Token(refreshToken, user, TokenType.BEARER, false)));
+
+		log.debug("JWT tokens generated successfully.");
 
 		return new AuthResponse(
 				token,
@@ -52,30 +49,43 @@ public class AuthService {
 	}
 
 	private void revokeAllValidUserTokens(User user) {
+		log.debug("Revoking %s's tokens.".formatted(user.getEmail()));
+
 		List<Token> validTokens = tokenRepository.findAllByUserIdAndRevoked(user.getId(), false);
 		validTokens.forEach(
-			token -> token.setRevoked(true)
-		);
+				token -> token.setRevoked(true));
 		tokenRepository.saveAll(validTokens);
+		log.debug("All tokens have been revoked.");
 	}
 
-	public AuthResponse register(User newUser) {
+	public AuthResponse register(AuthRequest newUser) {
+		log.info("Registering a new user.");
+		userDAO.getUserByEmail(newUser.getEmail())
+				.ifPresent(u -> {
+					throw new DuplicateResourceException(
+							"%s already exist".formatted(u.getEmail()));
+				});
 
-		Optional<User> user = userDAO.getUserByEmail(newUser.getEmail());
+		User user = new User(
+				newUser.getEmail(),
+				newUser.getPassword(),
+				UserType.USER,
+				true,
+				true,
+				true,
+				true
+		);
 
-		user.ifPresent(u -> {
-			throw new DuplicateResourceException(
-					"%s already exist".formatted(u.getEmail()));
-		});
+		userService.createUser(user);
 
-		newUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
-		newUser = userDAO.saveUser(newUser);
+		log.info("New user registered successfully.");
 
-		return generateTokens(newUser);
+		AuthResponse res = generateTokens(user);
+
+		return res;
 	}
 
-	public AuthResponse authenticate(User loginDetails) throws Exception {
-
+	public AuthResponse authenticate(AuthRequest loginDetails) throws Exception {
 		authenticationManager.authenticate(
 				new UsernamePasswordAuthenticationToken(
 						loginDetails.getEmail(),
@@ -83,7 +93,10 @@ public class AuthService {
 
 		User user = userDAO.getUserByEmail(loginDetails.getEmail()).get();
 
+		log.info("New successful login.");
+
 		revokeAllValidUserTokens(user);
+
 
 		return generateTokens(user);
 	}

@@ -1,11 +1,14 @@
 package com.auctionmaster.user;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import com.auctionmaster.token.Token;
 import com.auctionmaster.userprofile.UserProfile;
@@ -28,6 +31,7 @@ import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
+import jakarta.persistence.Transient;
 import jakarta.persistence.UniqueConstraint;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -40,7 +44,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
-public class User {
+public class User implements UserDetails{
 
 	@Id
 	@SequenceGenerator(name = "user_id_sequence", sequenceName = "user_id_sequence", allocationSize = 1)
@@ -69,6 +73,30 @@ public class User {
 	@OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	private List<Token> tokens;
 
+	@JsonIgnore
+	@Transient
+	private Collection<? extends GrantedAuthority> authorities;
+	
+	@JsonIgnore
+	@Transient
+	private String username;
+
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	@Column(name = "non_expired", nullable = false)
+	private boolean accountNonExpired;
+
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	@Column(name = "non_locked", nullable = false)
+	private boolean accountNonLocked;
+
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	@Column(name = "credentials_non_expired", nullable = false)
+	private boolean credentialsNonExpired;
+
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	@Column(name = "enabled", nullable = false)
+	private boolean enabled;
+
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	@Column(name = "created_at", nullable = false, updatable = false, columnDefinition = "TIMESTAMP WITHOUT TIME ZONE")
 	@CreatedDate
@@ -92,4 +120,44 @@ public class User {
 		this.password = password;
 	}
 
+	public User(String email, String password, UserType role, boolean accountNonExpired, boolean accountNonLocked,
+			boolean credentialsNonExpired, boolean enabled) {
+		this.email = email;
+		this.password = password;
+		this.role = role;
+		this.accountNonExpired = accountNonExpired;
+		this.accountNonLocked = accountNonLocked;
+		this.credentialsNonExpired = credentialsNonExpired;
+		this.enabled = enabled;
+	}
+
+	@Override
+	public Collection<? extends GrantedAuthority> getAuthorities() {
+		return role.getAuthorities();
+	}
+
+	@Override
+	public String getUsername() {
+		return email;
+	}
+
+	@Override
+	public boolean isAccountNonExpired() {
+		return accountNonExpired;
+	}
+
+	@Override
+	public boolean isAccountNonLocked() {
+		return accountNonLocked;
+	}
+
+	@Override
+	public boolean isCredentialsNonExpired() {
+		return credentialsNonExpired;
+	}
+
+	@Override
+	public boolean isEnabled() {
+		return enabled;
+	}
 }

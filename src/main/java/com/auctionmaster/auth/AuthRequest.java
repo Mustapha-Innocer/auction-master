@@ -2,15 +2,16 @@ package com.auctionmaster.auth;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.NonNull;
 
 @Data
-@NoArgsConstructor
 public class AuthRequest {
 
+	@NonNull
 	@NotBlank
 	private String email;
 
+	@NonNull
 	@NotBlank
 	private String password;
 }
