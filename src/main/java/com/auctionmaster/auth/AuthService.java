@@ -59,7 +59,6 @@ public class AuthService {
 	}
 
 	public AuthResponse register(AuthRequest newUser) {
-		log.info("Registering a new user.");
 		userDAO.getUserByEmail(newUser.getEmail())
 				.ifPresent(u -> {
 					throw new DuplicateResourceException(

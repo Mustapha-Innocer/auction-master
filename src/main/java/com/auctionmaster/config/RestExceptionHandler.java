@@ -12,7 +12,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import com.auctionmaster.exception.CustomException;
 import com.auctionmaster.exception.DuplicateResourceException;
 
+import lombok.extern.slf4j.Slf4j;
+
 @ControllerAdvice
+@Slf4j
 public class RestExceptionHandler {
 
 	@ExceptionHandler(DuplicateResourceException.class)
@@ -40,5 +43,15 @@ public class RestExceptionHandler {
 				HttpStatus.FORBIDDEN,
 				LocalDateTime.now());
 		return new ResponseEntity<>(customException, HttpStatus.FORBIDDEN);
+	}
+
+	@ExceptionHandler(Exception.class)
+	public ResponseEntity<Object> defaultHandler(Exception e) {
+		log.error(e.getMessage());
+		CustomException customException = new CustomException(
+				"Error has ocurred",
+				HttpStatus.BAD_REQUEST,
+				LocalDateTime.now());
+		return new ResponseEntity<>(customException, HttpStatus.BAD_REQUEST);
 	}
 }

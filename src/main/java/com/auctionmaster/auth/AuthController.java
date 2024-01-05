@@ -20,7 +20,7 @@ public class AuthController {
 	private final AuthService authService;
 
 	@PostMapping("/register")
-	public ResponseEntity<AuthResponse> register(@RequestBody @Valid AuthRequest newUser) throws Exception{
+	public ResponseEntity<AuthResponse> register(@Valid @RequestBody AuthRequest newUser) throws Exception{
 		return new ResponseEntity<>(authService.register(newUser), HttpStatus.CREATED);
 	}
 
