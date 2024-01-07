@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import com.auctionmaster.exception.CustomException;
 import com.auctionmaster.exception.DuplicateResourceException;
+import com.auctionmaster.exception.ResourceNotFoundException;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -43,6 +44,15 @@ public class RestExceptionHandler {
 				HttpStatus.FORBIDDEN,
 				LocalDateTime.now());
 		return new ResponseEntity<>(customException, HttpStatus.FORBIDDEN);
+	}
+	
+	@ExceptionHandler(ResourceNotFoundException.class)
+	public ResponseEntity<Object> resourceNotFoundException(ResourceNotFoundException e) {
+		CustomException customException = new CustomException(
+				e.getMessage(),
+				HttpStatus.NOT_FOUND,
+				LocalDateTime.now());
+		return new ResponseEntity<>(customException, HttpStatus.NOT_FOUND);
 	}
 
 	@ExceptionHandler(Exception.class)
