@@ -12,6 +12,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.HttpServletRequest;
 
 @Service
 public class JwtService {
@@ -72,5 +73,21 @@ public class JwtService {
 
 	public Boolean isTokenExpired(String token) {
 		return extractExpiration(token).before(new Date());
+	}
+
+	public String extractJwtFromReq(HttpServletRequest req) {
+		final String authHeader = req.getHeader("Authorization");
+		if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+			return null;
+		}
+		return authHeader.replace("Bearer ", "");
+	}
+
+	public String extractUsername(HttpServletRequest req) {
+		String jwt = extractJwtFromReq(req);
+		if (jwt != null) {
+			return extractClaim(jwt, Claims::getSubject);
+		}
+		return null;
 	}
 }
