@@ -39,4 +39,8 @@ public class UserService implements IUserService {
 		throw new UnsupportedOperationException("Unimplemented method 'changePassword'");
 	}
 
+	public void updateUser(User user) {
+		userDAO.saveUser(user);
+	}
+
 }
