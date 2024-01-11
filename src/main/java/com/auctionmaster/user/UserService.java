@@ -15,8 +15,10 @@ public class UserService implements IUserService {
 	private final PasswordEncoder passwordEncoder;
 
 	@Override
-	public User createUser(User user) {
-		user.setPassword(passwordEncoder.encode(user.getPassword()));
+	public User saveUser(User user) {
+		if (user.getId()==null) {
+			user.setPassword(passwordEncoder.encode(user.getPassword()));
+		}
 		return userDAO.saveUser(user);
 	}
 
@@ -26,21 +28,4 @@ public class UserService implements IUserService {
 				.orElseThrow(() -> new ResourceNotFoundException(
 						"User with email %s not found".formatted(email)));
 	}
-
-	@Override
-	public void removeUserByEmail(String email) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'removeUserByEmail'");
-	}
-
-	@Override
-	public User changePassword(String email, User upadates) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'changePassword'");
-	}
-
-	public void updateUser(User user) {
-		userDAO.saveUser(user);
-	}
-
 }

@@ -51,7 +51,7 @@ public class UserProfileService {
 
 		userProfile.setUser(user);
 		user.setProfile(userProfile);
-		userService.updateUser(user);
+		userService.saveUser(user);
 	}
 
 }

@@ -72,10 +72,9 @@ public class AuthService {
 				true,
 				true,
 				true,
-				true
-		);
+				true);
 
-		userService.createUser(user);
+		userService.saveUser(user);
 
 		log.info("New user registered successfully.");
 
@@ -95,7 +94,6 @@ public class AuthService {
 		log.info("New successful login.");
 
 		revokeAllValidUserTokens(user);
-
 
 		return generateTokens(user);
 	}
