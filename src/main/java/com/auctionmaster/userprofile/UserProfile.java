@@ -69,7 +69,7 @@ public class UserProfile {
 	@Column(name = "contact_number", nullable = false)
 	private String contactNumber;
 
-	@Column(name = "profile_picture_url", nullable = false)
+	@Column(name = "profile_picture_url")
 	private String profilePictureUrl;
 
 	@NotNull
