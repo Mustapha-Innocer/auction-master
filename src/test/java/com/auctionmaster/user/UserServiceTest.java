@@ -1,36 +1,32 @@
 package com.auctionmaster.user;
 
-import static org.mockito.Mockito.mock;
-
 import java.util.Optional;
 
 import static org.mockito.BDDMockito.given;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.auctionmaster.exception.ResourceNotFoundException;
 
+@ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
 
-	private final UserDAO userDAO = mock(UserDAO.class);
-	private final PasswordEncoder passwordEncoder = mock(PasswordEncoder.class);
+	@Mock
+	private UserDAO userDAO;
+
+	@Mock
+	private PasswordEncoder passwordEncoder;
+
+	@InjectMocks
 	private UserService underTest;
 
-	@BeforeEach
-	void setUp() {
-		// MockitoAnnotations.openMocks(underTest);
-		underTest = new UserService(userDAO, passwordEncoder);
-	}
-
-	@AfterEach
-	void tearDown() {
-
-	}
 
 	@Test
 	void testSaveUser() {
@@ -85,8 +81,7 @@ public class UserServiceTest {
 				true,
 				true);
 		expectedUser.setId(1L);
-
-		given(passwordEncoder.encode("12345")).willReturn("password");
+		
 		given(userDAO.saveUser(user)).willReturn(user);
 
 		// When
