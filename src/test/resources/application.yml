@@ -1,0 +1,7 @@
+application:
+    security:
+        jwt:
+            secret-key: secretsecretsecretsecretsecretsecretsecretsecret
+            expirations:
+                token: 138000000
+                refresh-token: 1380000000
